@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,8 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
+    @Getter
     protected final Map<Integer, User> users = new HashMap<>();
     private int userId = 1;
 
