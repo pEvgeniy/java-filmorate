@@ -2,18 +2,34 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import ru.yandex.practicum.filmorate.annotation.IsAfter;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class Film {
 
     private int id;
+
+    @NotNull
+    @NotBlank
     private String name;
+
+    @NotNull
+    @NotBlank
+    @Size(max = 200, message = "Description length must be less than 200 characters.")
     private String description;
+
+    @NotNull
+    @IsAfter(year = 1895, month = 11, day = 28)
     private LocalDate releaseDate;
+
+    @NotNull
+    @Positive
     private Long duration;
 }
