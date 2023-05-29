@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.annotation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 public class IsAfterValidator implements ConstraintValidator<IsAfter, LocalDate> {
