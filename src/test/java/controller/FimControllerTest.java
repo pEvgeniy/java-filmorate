@@ -20,73 +20,78 @@ public class FimControllerTest {
 
     private Validator validator;
     private final LocalDate date = LocalDate.of(1967, 3, 25);
+    private Film film;
 
     @BeforeEach
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        film = new Film();
+        film.setId(0);
+        film.setName("name");
+        film.setDescription("description");
+        film.setReleaseDate(date);
+        film.setDuration(100L);
     }
 
     @Test
     public void create() {
-        Film film = new Film(0, "name", "description", date, 100L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     public void createFilmWhenNameIsNull() {
-        Film film = new Film(0, null, "description", date, 100L);
+        film.setName(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createFilmWhenNameIsEmpty() {
-        Film film = new Film(0, "", "description", date, 100L);
+        film.setName("");
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDescriptionIsNull() {
-        Film film = new Film(0, "name", null, date, 100L);
+        film.setDescription(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createFilmWhenDescriptionIsEmpty() {
-        Film film = new Film(0, "name", "", date, 100L);
+        film.setDescription("");
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsNull() {
-        Film film = new Film(0, "name", "description", date, null);
+        film.setDuration(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsZero() {
-        Film film = new Film(0, "name", "description", date, 0L);
+        film.setDuration(0L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsNegative() {
-        Film film = new Film(0, "name", "description", date, -100L);
+        film.setDuration(-100L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmReleaseDateIsBefore19852() {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1895, 11, 27), 100L);
+        film.setReleaseDate(LocalDate.of(1895, 11, 27));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }

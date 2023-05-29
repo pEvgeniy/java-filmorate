@@ -40,7 +40,9 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        return Optional.ofNullable(users.get(user.getId()))
+        return users.entrySet().stream()
+                .filter(entry -> entry.getKey().equals(user.getId()))
+                .findFirst()
                 .map(existingUser -> {
                     users.put(user.getId(), user);
                     log.info("Updated user {}", user.getName());

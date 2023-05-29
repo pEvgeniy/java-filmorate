@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Slf4j
 @RestController
@@ -37,7 +38,9 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        return Optional.ofNullable(films.get(film.getId()))
+        return films.entrySet().stream()
+                .filter(entry -> entry.getKey().equals(film.getId()))
+                .findFirst()
                 .map(existingFilm -> {
                     films.put(film.getId(), film);
                     log.info("Updated film {}", film.getName());

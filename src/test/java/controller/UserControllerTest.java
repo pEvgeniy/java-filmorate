@@ -20,66 +20,71 @@ public class UserControllerTest {
 
     private Validator validator;
     private final LocalDate date = LocalDate.of(2000, 5, 20);
+    private User user;
 
     @BeforeEach
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        user = new User();
+        user.setId(0);
+        user.setLogin("login");
+        user.setName("name");
+        user.setEmail("mymail@mail.ru");
+        user.setBirthday(date);
     }
 
     @Test
     public void create() {
-        User user = new User(0, "login", "name", "mymail@mail.ru", date);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     public void createUserWithBadEmail() {
-        User user = new User(0, "login", "name", "", date);
+        user.setEmail("");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithoutAt() {
-        User user = new User(0, "login", "name", "myemail", date);
+        user.setEmail("myemail");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithNullLogin() {
-        User user = new User(0, null, "name", "myemail@mail.ru", date);
+        user.setLogin(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithEmptyLogin() {
-        User user = new User(0, "", "name", "myemail@mail.ru", date);
+        user.setLogin("");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithWhitespacesInLogin() {
-        User user = new User(0, " lo g in ", "name", "myemail@mail.ru", date);
+        user.setLogin(" lo g in ");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithNullBirthday() {
-        User user = new User(0, "login", "name", "myemail@mail.ru", null);
+        user.setBirthday(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createUserWithBirthdayInTheFuture() {
-        User user = new User(0, "login", "name", "myemail@mail.ru",
-                LocalDate.now().plusDays(1));
+        user.setBirthday(LocalDate.now().plusDays(1));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }

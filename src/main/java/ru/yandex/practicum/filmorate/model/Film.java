@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import ru.yandex.practicum.filmorate.annotation.IsAfter;
@@ -11,16 +10,13 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
 public class Film {
 
     private int id;
 
-    @NotNull
     @NotBlank
     private String name;
 
-    @NotNull
     @NotBlank
     @Size(max = 200, message = "Description length must be less than 200 characters.")
     private String description;
