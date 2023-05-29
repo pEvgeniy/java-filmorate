@@ -1,129 +1,93 @@
 package controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.InvalidFilmException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class FimControllerTest {
 
-    private FilmController filmController;
+    private Validator validator;
+    private final LocalDate date = LocalDate.of(1967, 3, 25);
 
     @BeforeEach
-    public void beforeEach() {
-        filmController = new FilmController();
+    public void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
     public void create() {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1967, 3, 25), 100L);
-        filmController.create(film);
-
-        Film expectedFilm = new Film(1, "name", "description",
-                LocalDate.of(1967, 3, 25), 100L);
-        Assertions.assertEquals(expectedFilm, filmController.getFilms().get(1));
+        Film film = new Film(0, "name", "description", date, 100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    public void createWhenFilmNameIsNull() {
-        Film film = new Film(0, null, "description",
-                LocalDate.of(1967, 3, 25), 100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film name must not be empty!", exception.getMessage());
+    public void createFilmWhenNameIsNull() {
+        Film film = new Film(0, null, "description", date, 100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void createWhenFilmNameIsEmpty() {
-        Film film = new Film(0, "", "description",
-                LocalDate.of(1967, 3, 25), 100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film name must not be empty!", exception.getMessage());
+    public void createFilmWhenNameIsEmpty() {
+        Film film = new Film(0, "", "description", date, 100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDescriptionIsNull() {
-        Film film = new Film(0, "name", null,
-                LocalDate.of(1967, 3, 25), 100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film description must not be empty!", exception.getMessage());
+        Film film = new Film(0, "name", null, date, 100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void createWhenFilmDescriptionIsEmpty() {
-        Film film = new Film(0, "name", "",
-                LocalDate.of(1967, 3, 25), 100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film description must not be empty!", exception.getMessage());
+    public void createFilmWhenDescriptionIsEmpty() {
+        Film film = new Film(0, "name", "", date, 100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsNull() {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1967, 3, 25), null);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film duration must be positive!", exception.getMessage());
+        Film film = new Film(0, "name", "description", date, null);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsZero() {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1967, 3, 25), 0L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film duration must be positive!", exception.getMessage());
+        Film film = new Film(0, "name", "description", date, 0L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void createWhenFilmDurationIsNegative() {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1967, 3, 25), -100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film duration must be positive!", exception.getMessage());
+        Film film = new Film(0, "name", "description", date, -100L);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void createWhenFilmReleaseDateIsBefore1985() {
+    public void createWhenFilmReleaseDateIsBefore19852() {
         Film film = new Film(0, "name", "description",
                 LocalDate.of(1895, 11, 27), 100L);
-
-        final InvalidFilmException exception = Assertions.assertThrows(
-                InvalidFilmException.class,
-                () -> filmController.create(film)
-        );
-        Assertions.assertEquals("Film release date must be not older than 28.11.1895!", exception.getMessage());
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 }
