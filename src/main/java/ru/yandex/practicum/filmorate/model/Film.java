@@ -1,13 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-
 import ru.yandex.practicum.filmorate.annotation.IsAfter;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -28,4 +30,7 @@ public class Film {
     @NotNull
     @Positive
     private Long duration;
+
+    @NotNull
+    private Set<Integer> likes = new HashSet<>();
 }
