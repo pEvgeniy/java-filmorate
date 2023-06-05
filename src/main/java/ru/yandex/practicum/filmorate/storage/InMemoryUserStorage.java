@@ -38,8 +38,8 @@ public class InMemoryUserStorage implements UserStorage {
             log.info("User {} removed", user.getName());
             return user;
         }
-        log.warn("User {} to delete not found.", user.getName());
-        throw new UserNotFoundException("User not found.");
+        log.warn("User {} to delete not found", user.getName());
+        throw new UserNotFoundException("User not found");
     }
 
     @Override
@@ -53,8 +53,8 @@ public class InMemoryUserStorage implements UserStorage {
                     return user;
                 })
                 .orElseThrow(() -> {
-                    log.warn("User {} to update not found.", user.getName());
-                    return new UserNotFoundException("User not found.");
+                    log.warn("User {} to update not found", user.getName());
+                    return new UserNotFoundException("User not found");
                 });
     }
 
@@ -72,6 +72,6 @@ public class InMemoryUserStorage implements UserStorage {
             return foundUser;
         }
         log.warn("User by id={} not found", userId);
-        throw new UserNotFoundException("User not found.");
+        throw new UserNotFoundException("User not found");
     }
 }

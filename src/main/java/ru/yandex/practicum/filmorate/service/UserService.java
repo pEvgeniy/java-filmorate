@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -42,7 +41,7 @@ public class UserService {
             return user;
         }
         log.warn("Friend by id={} to be deleted not found", friendId);
-        throw new FriendNotFoundException("Friend not found.");
+        throw new FriendNotFoundException("Friend not found");
     }
 
     public List<User> findFriends(int userId) {

@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class FilmService {
-
-    FilmStorage filmStorage;
+    private final FilmStorage filmStorage;
 
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
@@ -35,7 +34,7 @@ public class FilmService {
             return film;
         }
         log.warn("Like from user with id={} to film {} not found", userId, film.getName());
-        throw new LikeNotFoundException("Like not found.");
+        throw new LikeNotFoundException("Like not found");
     }
 
     public List<Film> findPopularFilms(int count) {

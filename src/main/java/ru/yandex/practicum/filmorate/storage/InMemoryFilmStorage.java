@@ -35,8 +35,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.info("Film {} removed", film.getName());
             return film;
         }
-        log.warn("Film {} to update not found.", film.getName());
-        throw new FilmNotFoundException("Film not found.");
+        log.warn("Film {} to update not found", film.getName());
+        throw new FilmNotFoundException("Film not found");
     }
 
     @Override
@@ -50,8 +50,8 @@ public class InMemoryFilmStorage implements FilmStorage {
                     return film;
                 })
                 .orElseThrow(() -> {
-                    log.warn("Film {} to update not found.", film.getName());
-                    return new FilmNotFoundException("Film not found.");
+                    log.warn("Film {} to update not found", film.getName());
+                    return new FilmNotFoundException("Film not found");
                 });
     }
 
@@ -69,6 +69,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             return foundFilm;
         }
         log.warn("Film by id={} not found", filmId);
-        throw new FilmNotFoundException("Film not found.");
+        throw new FilmNotFoundException("Film not found");
     }
 }
