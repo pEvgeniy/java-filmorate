@@ -209,8 +209,8 @@ public class FilmDbStorage implements FilmStorage {
                 "SELECT GENRES.GENRE_ID, GENRES.NAME " +
                         "FROM GENRES JOIN GENRES_TO_FILMS GTF on GENRES.GENRE_ID = GTF.GENRE_ID " +
                         "WHERE FILM_ID=? " +
-                        "GROUP BY GENRES.GENRE_ID, GENRES.NAME"
-                , id);
+                        "GROUP BY GENRES.GENRE_ID, GENRES.NAME",
+                id);
 
         while (sqlRowSet.next()) {
             genres.add(Genre.builder()
