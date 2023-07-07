@@ -62,10 +62,10 @@ public class FilmDbService implements FilmService {
         String sql = "SELECT f.* " +
                 "FROM films f " +
                 "JOIN (SELECT film_id, COUNT(*) AS like_count " +
-                        "FROM likes " +
-                        "GROUP BY film_id " +
-                        "ORDER BY like_count DESC " +
-                        "LIMIT ?) l " +
+                "FROM likes " +
+                "GROUP BY film_id " +
+                "ORDER BY like_count DESC " +
+                "LIMIT ?) l " +
                 "ON f.film_id = l.film_id";
 
         List<Film> popularFilms = jdbcTemplate.query(sql, this::mapRowToFilm, count);
@@ -111,8 +111,8 @@ public class FilmDbService implements FilmService {
                 "SELECT GENRES.GENRE_ID, GENRES.NAME " +
                         "FROM GENRES JOIN GENRES_TO_FILMS GTF on GENRES.GENRE_ID = GTF.GENRE_ID " +
                         "WHERE FILM_ID=? " +
-                        "GROUP BY GENRES.GENRE_ID, GENRES.NAME"
-                , id);
+                        "GROUP BY GENRES.GENRE_ID, GENRES.NAME",
+                id);
 
         while (sqlRowSet.next()) {
             genres.add(Genre.builder()
