@@ -54,7 +54,7 @@ public class FilmDbService implements FilmService {
             log.error("/DELETE. Film(id = {}) or user(id = {}) to be deleted not found", filmId, userId);
             throw new LikeNotFoundException("Like not found");
         }
-        log.info("/DELETE. Friend deleted");;
+        log.info("/DELETE. Friend deleted");
         return filmStorage.findFilmById(filmId);
     }
 

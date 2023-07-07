@@ -173,7 +173,6 @@ public class FilmDbStorage implements FilmStorage {
         addGenreIdToFilms(film);
     }
 
-    //    TODO - genres
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
                 .id(rs.getInt("film_id"))
