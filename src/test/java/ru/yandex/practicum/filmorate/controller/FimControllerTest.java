@@ -1,9 +1,10 @@
-package controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -26,12 +27,17 @@ public class FimControllerTest {
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        film = new Film();
-        film.setId(0);
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(date);
-        film.setDuration(100L);
+        film = Film.builder()
+                .id(1)
+                .name("name")
+                .description("description")
+                .releaseDate(date)
+                .duration(100L)
+                .mpa(Mpa.builder()
+                        .id(0)
+                        .name("G")
+                        .build())
+                .build();
     }
 
     @Test

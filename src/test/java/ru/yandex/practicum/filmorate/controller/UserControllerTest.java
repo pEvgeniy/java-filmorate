@@ -1,4 +1,4 @@
-package controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,12 +26,13 @@ public class UserControllerTest {
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        user = new User();
-        user.setId(0);
-        user.setLogin("login");
-        user.setName("name");
-        user.setEmail("mymail@mail.ru");
-        user.setBirthday(date);
+        user = User.builder()
+                .id(1)
+                .login("login")
+                .name("name")
+                .email("mymail@mail.ru")
+                .birthday(date)
+                .build();
     }
 
     @Test
