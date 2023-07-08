@@ -10,14 +10,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.dao.FilmDbService;
-import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.service.dao.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.storage.dao.FilmStorageImpl;
+import ru.yandex.practicum.filmorate.storage.dao.UserStorageImpl;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,15 +24,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class FilmDbServiceTest {
+public class FilmServiceImplTest {
 
-    private final FilmDbStorage filmDbStorage;
+    private final FilmStorageImpl filmDbStorage;
 
-    private final UserDbStorage userDbStorage;
+    private final UserStorageImpl userDbStorage;
 
-    private final FilmDbService filmDbService;
+    private final FilmServiceImpl filmDbService;
     private Film film;
+    private Film film2;
     private User user;
+    private User user2;
 
     @BeforeEach
     public void startUp() {
@@ -54,6 +55,23 @@ public class FilmDbServiceTest {
                 .birthday(LocalDate.of(2000, 5, 20))
                 .build();
         userDbStorage.create(user);
+        film2 = Film.builder()
+                .name("Dune 2")
+                .description("Some film description")
+                .releaseDate(LocalDate.of(2021, 1, 1))
+                .duration(180L)
+                .mpa(Mpa.builder()
+                        .id(1)
+                        .build())
+                .build();
+        filmDbStorage.create(film2);
+        user2 = User.builder()
+                .login("login2")
+                .name("name2")
+                .email("mymail2@mail.com")
+                .birthday(LocalDate.of(2000, 5, 20))
+                .build();
+        userDbStorage.create(user2);
     }
 
     @Test
@@ -62,7 +80,7 @@ public class FilmDbServiceTest {
         assertThat(filmWithLike)
                 .isPresent()
                 .hasValueSatisfying(f ->
-                    assertThat(f).hasFieldOrPropertyWithValue("likes", Set.of(1))
+                    assertThat(f).hasFieldOrPropertyWithValue("id", film.getId())
                 );
     }
 
@@ -74,30 +92,12 @@ public class FilmDbServiceTest {
         assertThat(deletedFilm)
                 .isPresent()
                 .hasValueSatisfying(f ->
-                    assertThat(f).hasFieldOrPropertyWithValue("likes", Set.of())
+                    assertThat(f).hasFieldOrPropertyWithValue("id", film.getId())
                 );
     }
 
     @Test
     public void findPopularFilms() {
-        Film film2 = Film.builder()
-                .name("Dune 2")
-                .description("Some film description")
-                .releaseDate(LocalDate.of(2021, 1, 1))
-                .duration(180L)
-                .mpa(Mpa.builder()
-                        .id(1)
-                        .build())
-                .build();
-        filmDbStorage.create(film2);
-        User user2 = User.builder()
-                .login("login2")
-                .name("name2")
-                .email("mymail@mail.com")
-                .birthday(LocalDate.of(2000, 5, 20))
-                .build();
-        userDbStorage.create(user2);
-
         filmDbService.addLike(film.getId(), user.getId());
         filmDbService.addLike(film2.getId(), user.getId());
         filmDbService.addLike(film2.getId(), user2.getId());

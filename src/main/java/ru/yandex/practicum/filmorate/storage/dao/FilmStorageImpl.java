@@ -2,23 +2,21 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.enums.GenreType;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,12 +24,11 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Qualifier("filmDbStorage")
-public class FilmDbStorage implements FilmStorage {
-    JdbcTemplate jdbcTemplate;
+public class FilmStorageImpl implements FilmStorage {
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    public FilmStorageImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -55,7 +52,7 @@ public class FilmDbStorage implements FilmStorage {
         int result = jdbcTemplate.update(sqlQuery, film.getId());
         if (result == 0) {
             log.error("/DELETE. Film with id = {} to be deleted not found", film.getId());
-            throw new FilmNotFoundException("Film with id = " + film.getId() + " not found");
+            throw new EntityNotFoundException("Film with id = " + film.getId() + " not found");
         }
         log.info("/DELETE. Film with id = {} deleted", film.getId());
         return film;
@@ -73,7 +70,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId());
         if (result == 0) {
             log.error("/PUT. Film with id = {} to be updated not found", film.getId());
-            throw new FilmNotFoundException("Film with id = " + film.getId() + " not found");
+            throw new EntityNotFoundException("Film with id = " + film.getId() + " not found");
         }
         updateGenreIdToFilms(film);
         setUpFilm(film);
@@ -103,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
         } catch (DataAccessException e) {
             log.error("/GET. Film with id = {} not found", filmId);
-            throw new FilmNotFoundException("Film not found");
+            throw new EntityNotFoundException("Film not found");
         }
     }
 
@@ -111,7 +108,6 @@ public class FilmDbStorage implements FilmStorage {
         addGenreIdToFilms(film);
         getGenres(film);
         film.setMpa(getMpa(film.getMpa().getId()));
-        film.setLikes(getLikes(film.getId()));
         return film;
     }
 
@@ -127,7 +123,7 @@ public class FilmDbStorage implements FilmStorage {
             do {
                 genre = Genre.builder()
                         .id(rs.getInt("genre_id"))
-                        .name(GenreType.valueOf(rs.getString("name")))
+                        .name(rs.getString("name"))
                         .build();
                 film.getGenres().remove(genre);
                 film.getGenres().add(genre);
@@ -157,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
             int result = jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             if (result == 0) {
                 log.error("/POST. Film to be updated not found");
-                throw new FilmNotFoundException("Film with id = " + film.getId() + " not found");
+                throw new EntityNotFoundException("Film with id = " + film.getId() + " not found");
             }
             log.info("/POST. Genre inserted into genres_to_films");
         });
@@ -180,7 +176,6 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getLong("duration"))
-                .likes(getLikes(rs.getInt("film_id")))
                 .mpa(getMpa(rs.getInt("mpa_id")))
                 .genres(getGenres(rs.getInt("film_id")))
                 .build();
@@ -203,7 +198,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Set<Genre> getGenres(int id) {
-        Set<Genre> genres = new HashSet<>();
+        Set<Genre> genres = new LinkedHashSet<>();
 
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(
                 "SELECT GENRES.GENRE_ID, GENRES.NAME " +
@@ -215,19 +210,9 @@ public class FilmDbStorage implements FilmStorage {
         while (sqlRowSet.next()) {
             genres.add(Genre.builder()
                     .id(sqlRowSet.getInt("genre_id"))
-                    .name(GenreType.valueOf(sqlRowSet.getString("name")))
+                    .name(sqlRowSet.getString("name"))
                     .build());
         }
         return genres;
-    }
-
-    private Set<Integer> getLikes(int filmId) {
-        String sqlQuery =
-                "SELECT USER_ID " +
-                        "FROM LIKES " +
-                        "WHERE FILM_ID=?";
-        List<Integer> likes = jdbcTemplate.query(sqlQuery,
-                (rs, rowNum) -> rs.getInt("user_id"), filmId);
-        return new HashSet<>(likes);
     }
 }

@@ -7,8 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.enums.GenreType;
-import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.GenreStorageImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class GenreDbStorageTest {
+public class GenreStorageImplTest {
 
-    private final GenreDbStorage genreDbStorage;
+    private final GenreStorageImpl genreDbStorage;
 
     @Test
     public void findAll() {
@@ -37,7 +36,7 @@ public class GenreDbStorageTest {
         assertThat(genre)
                 .isPresent()
                 .hasValueSatisfying(g ->
-                    assertThat(g).hasFieldOrPropertyWithValue("name", GenreType.Комедия)
+                    assertThat(g).hasFieldOrPropertyWithValue("name", "Комедия")
                 );
     }
 
@@ -47,7 +46,7 @@ public class GenreDbStorageTest {
         assertThat(genre)
                 .isPresent()
                 .hasValueSatisfying(g ->
-                        assertThat(g).hasFieldOrPropertyWithValue("name", GenreType.Боевик)
+                        assertThat(g).hasFieldOrPropertyWithValue("name", "Боевик")
                 );
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
-    GenreStorage genreStorage;
+    private final GenreStorage genreStorage;
 
     public GenreController(GenreStorage genreStorage) {
         this.genreStorage = genreStorage;

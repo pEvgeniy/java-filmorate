@@ -2,12 +2,11 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -21,12 +20,11 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Qualifier("userDbStorage")
-public class UserDbStorage implements UserStorage {
-    JdbcTemplate jdbcTemplate;
+public class UserStorageImpl implements UserStorage {
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserStorageImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -39,7 +37,6 @@ public class UserDbStorage implements UserStorage {
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
         user.setId(insert.executeAndReturnKey(userToMap(user)).intValue());
-        user.setFriends(getFriends(user.getId()));
         log.info("/POST. User with id = {} created", user.getId());
         return user;
     }
@@ -53,7 +50,7 @@ public class UserDbStorage implements UserStorage {
         int result = jdbcTemplate.update(sqlQuery, user.getId());
         if (result == 0) {
             log.error("/DELETE. User with id = {} to be deleted not found", user.getId());
-            throw new UserNotFoundException("User with id = " + user.getId() + " not found");
+            throw new EntityNotFoundException("User with id = " + user.getId() + " not found");
         }
         log.info("/DELETE. User with id = {} deleted", user.getId());
         return user;
@@ -70,7 +67,7 @@ public class UserDbStorage implements UserStorage {
                 user.getId());
         if (result == 0) {
             log.error("/UPDATE. User with id = {} to be updated not found", user.getId());
-            throw new UserNotFoundException("User with id = " + user.getId() + " not found");
+            throw new EntityNotFoundException("User with id = " + user.getId() + " not found");
         }
         log.info("/UPDATE. User with id = {} updated", user.getId());
         return user;
@@ -98,7 +95,7 @@ public class UserDbStorage implements UserStorage {
             return user;
         } catch (DataAccessException e) {
             log.error("User with id = {} not found", userId);
-            throw new UserNotFoundException("User not found");
+            throw new EntityNotFoundException("User not found");
         }
     }
 
@@ -118,7 +115,6 @@ public class UserDbStorage implements UserStorage {
                 .name(rs.getString("name"))
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
-                .friends(getFriends(rs.getInt("user_id")))
                 .build();
     }
 

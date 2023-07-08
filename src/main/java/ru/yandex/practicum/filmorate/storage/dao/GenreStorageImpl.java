@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.enums.GenreType;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
@@ -16,11 +15,11 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class GenreDbStorage implements GenreStorage {
-    JdbcTemplate jdbcTemplate;
+public class GenreStorageImpl implements GenreStorage {
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
+    public GenreStorageImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -46,14 +45,14 @@ public class GenreDbStorage implements GenreStorage {
             return genre;
         } catch (DataAccessException e) {
             log.error("/GET. Genre with id = {} not found", id);
-            throw new GenreNotFoundException("Genre with id = " + id + " not found");
+            throw new EntityNotFoundException("Genre with id = " + id + " not found");
         }
     }
 
     private Genre mapToRowGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getInt("genre_id"))
-                .name(GenreType.valueOf(rs.getString("name")))
+                .name(rs.getString("name"))
                 .build();
     }
 }

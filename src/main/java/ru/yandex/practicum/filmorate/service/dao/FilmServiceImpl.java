@@ -1,33 +1,29 @@
 package ru.yandex.practicum.filmorate.service.dao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.enums.GenreType;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 @Slf4j
 @Service
-@Qualifier("filmDbService")
-public class FilmDbService implements FilmService {
-    FilmStorage filmStorage;
-    JdbcTemplate jdbcTemplate;
+public class FilmServiceImpl implements FilmService {
+    private final FilmStorage filmStorage;
+    private final JdbcTemplate jdbcTemplate;
 
-    public FilmDbService(@Qualifier("filmDbStorage") FilmStorage filmStorage, JdbcTemplate jdbcTemplate) {
+    public FilmServiceImpl(FilmStorage filmStorage, JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -38,7 +34,7 @@ public class FilmDbService implements FilmService {
         int result = jdbcTemplate.update(sqlQuery, userId, filmId);
         if (result == 0) {
             log.error("/PUT. Film(id = {}) or user(id = {}) not found", filmId, userId);
-            throw new LikeNotFoundException("Error with insert into LIKES (USER_ID, FILM_ID)");
+            throw new EntityNotFoundException("Error with insert into LIKES (USER_ID, FILM_ID)");
         }
         log.info("/PUT. Like added");
         return filmStorage.findFilmById(filmId);
@@ -52,7 +48,7 @@ public class FilmDbService implements FilmService {
         int result = jdbcTemplate.update(sqlQuery, userId, filmId);
         if (result == 0) {
             log.error("/DELETE. Film(id = {}) or user(id = {}) to be deleted not found", filmId, userId);
-            throw new LikeNotFoundException("Like not found");
+            throw new EntityNotFoundException("Like not found");
         }
         log.info("/DELETE. Friend deleted");
         return filmStorage.findFilmById(filmId);
@@ -105,7 +101,7 @@ public class FilmDbService implements FilmService {
     }
 
     private Set<Genre> getGenres(int id) {
-        Set<Genre> genres = new HashSet<>();
+        Set<Genre> genres = new LinkedHashSet<>();
 
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(
                 "SELECT GENRES.GENRE_ID, GENRES.NAME " +
@@ -117,7 +113,7 @@ public class FilmDbService implements FilmService {
         while (sqlRowSet.next()) {
             genres.add(Genre.builder()
                     .id(sqlRowSet.getInt("genre_id"))
-                    .name(GenreType.valueOf(sqlRowSet.getString("name")))
+                    .name(sqlRowSet.getString("name"))
                     .build());
         }
         return genres;
@@ -131,7 +127,7 @@ public class FilmDbService implements FilmService {
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
         if (films.size() == 0) {
             log.info("/GET. Friends is empty");
-            throw new FilmNotFoundException("Films not found");
+            throw new EntityNotFoundException("Films not found");
         }
         return films;
     }

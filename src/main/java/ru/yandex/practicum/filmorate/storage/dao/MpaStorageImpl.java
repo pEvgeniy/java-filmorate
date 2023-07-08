@@ -2,11 +2,10 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
@@ -16,12 +15,11 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Qualifier("mpaDbStorage")
-public class MpaDbStorage implements MpaStorage {
-    JdbcTemplate jdbcTemplate;
+public class MpaStorageImpl implements MpaStorage {
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
+    public MpaStorageImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -47,7 +45,7 @@ public class MpaDbStorage implements MpaStorage {
             return mpa;
         } catch (DataAccessException e) {
             log.error("/GET. Mpa with id = {} not found", id);
-            throw new MpaNotFoundException("Mpa with id = " + id + " not found");
+            throw new EntityNotFoundException("Mpa with id = " + id + " not found");
         }
     }
 

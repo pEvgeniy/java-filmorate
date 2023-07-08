@@ -8,13 +8,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.dao.UserDbService;
-import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.service.dao.UserServiceImpl;
+import ru.yandex.practicum.filmorate.storage.dao.UserStorageImpl;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,11 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class UserDbServiceTest {
+public class UserServiceImplTest {
 
-    private final UserDbStorage userDbStorage;
+    private final UserStorageImpl userDbStorage;
 
-    private final UserDbService userDbService;
+    private final UserServiceImpl userDbService;
     private User user1;
     private User user2;
     private User user3;
@@ -58,24 +56,24 @@ public class UserDbServiceTest {
 
     @Test
     public void addFriend() {
-        Optional<User> userWithNewFriend = Optional.of(userDbService.addFriend(user1.getId(), user2.getId()));
-        assertThat(userWithNewFriend)
-                .isPresent()
-                .hasValueSatisfying(u ->
-                    assertThat(u).hasFieldOrPropertyWithValue("friends", Set.of(2))
-                );
+        userDbService.addFriend(user1.getId(), user2.getId());
+
+        List<User> friends = userDbService.findFriends(user1.getId());
+        assertThat(friends)
+                .isNotEmpty()
+                .hasSize(1);
+        assertThat(friends.get(0))
+                .hasFieldOrPropertyWithValue("name", "name2");
     }
 
     @Test
     public void deleteFriend() {
         userDbService.addFriend(user1.getId(), user2.getId());
 
-        Optional<User> userWithoutNewFriend = Optional.of(userDbService.deleteFriend(user1.getId(), user2.getId()));
-        assertThat(userWithoutNewFriend)
-                .isPresent()
-                .hasValueSatisfying(u ->
-                    assertThat(u).hasFieldOrPropertyWithValue("friends", Set.of())
-                );
+        userDbService.deleteFriend(user1.getId(), user2.getId());
+        List<User> friends = userDbService.findFriends(user1.getId());
+        assertThat(friends)
+                .isEmpty();
     }
 
     @Test

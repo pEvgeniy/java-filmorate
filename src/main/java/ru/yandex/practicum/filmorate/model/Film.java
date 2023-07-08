@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.annotation.IsAfter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Data
 @Builder(toBuilder = true)
 public class Film {
-
+    @PositiveOrZero
     private int id;
 
     @NotBlank
@@ -31,8 +32,6 @@ public class Film {
     @NotNull
     @Positive
     private Long duration;
-
-    private Set<Integer> likes;
 
     private Set<Genre> genres;
 

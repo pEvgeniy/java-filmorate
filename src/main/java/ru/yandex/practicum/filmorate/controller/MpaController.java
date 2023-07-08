@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/mpa")
 public class MpaController {
-    MpaStorage mpaStorage;
+    private final MpaStorage mpaStorage;
 
     @Autowired
     public MpaController(MpaStorage mpaStorage) {

@@ -28,7 +28,7 @@ public class FimControllerTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
         film = Film.builder()
-                .id(0)
+                .id(1)
                 .name("name")
                 .description("description")
                 .releaseDate(date)

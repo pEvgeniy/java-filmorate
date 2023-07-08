@@ -1,29 +1,25 @@
 package ru.yandex.practicum.filmorate.service.dao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
-@Qualifier("userDbService")
-public class UserDbService implements UserService {
-    UserStorage userStorage;
-    JdbcTemplate jdbcTemplate;
+public class UserServiceImpl implements UserService {
+    private final UserStorage userStorage;
+    private final JdbcTemplate jdbcTemplate;
 
-    public UserDbService(@Qualifier("userDbStorage") UserStorage userStorage,
-                         JdbcTemplate jdbcTemplate) {
+    public UserServiceImpl(UserStorage userStorage,
+                           JdbcTemplate jdbcTemplate) {
         this.userStorage = userStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -35,7 +31,7 @@ public class UserDbService implements UserService {
         int result = jdbcTemplate.update(sqlQuery, userId, friendId);
         if (result == 0) {
             log.error("/PUT. Friend(id = {}) or user(id = {}) not found", friendId, userId);
-            throw new FriendNotFoundException("Friend not found");
+            throw new EntityNotFoundException("Friend not found");
         }
         log.error("/PUT. Friend added");
         setFriendshipStatus(userId, friendId);
@@ -51,7 +47,7 @@ public class UserDbService implements UserService {
         int result = jdbcTemplate.update(sqlQuery, userId, friendId);
         if (result == 0) {
             log.error("/DELETE. Friend(id = {}) or user(id = {}) to be deleted not found", friendId, userId);
-            throw new FriendNotFoundException("Friend not found");
+            throw new EntityNotFoundException("Friend not found");
         }
         log.info("/DELETE. Friend deleted");
         setFriendshipStatus(userId, friendId);
@@ -91,19 +87,7 @@ public class UserDbService implements UserService {
                 .name(rs.getString("name"))
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
-                .friends(getFriends(rs.getInt("user_id")))
                 .build();
-    }
-
-    private Set<Integer> getFriends(int userId) {
-        String sqlQuery =
-                "SELECT FRIEND_ID " +
-                        "FROM FRIENDS " +
-                        "WHERE USER_ID=?";
-
-        List<Integer> friends =
-                jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getInt("friend_id"), userId);
-        return new HashSet<>(friends);
     }
 
     private void setFriendshipStatus(int userId, int friendId) {

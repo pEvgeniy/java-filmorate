@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.dao.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.MpaStorageImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class MpaDbStorageTest {
+public class MpaStorageImplTest {
 
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaStorageImpl mpaDbStorage;
 
     @Test
     public void findAll() {

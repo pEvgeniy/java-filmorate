@@ -30,7 +30,9 @@ CREATE TABLE IF NOT EXISTS users (
     login    VARCHAR(255) NOT NULL,
     name     VARCHAR(255),
     email    VARCHAR(255) NOT NULL,
-    birthday DATE         NOT NULL
+    birthday DATE         NOT NULL,
+    CONSTRAINT user_email_uindex UNIQUE (email),
+    CONSTRAINT user_login_uindex UNIQUE (login)
 );
 
 CREATE TABLE IF NOT EXISTS likes (
