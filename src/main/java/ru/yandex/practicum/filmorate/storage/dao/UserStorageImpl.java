@@ -13,10 +13,8 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -116,16 +114,5 @@ public class UserStorageImpl implements UserStorage {
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
-    }
-
-    private Set<Integer> getFriends(int userId) {
-        String sqlQuery =
-                "SELECT FRIEND_ID " +
-                        "FROM FRIENDS " +
-                        "WHERE USER_ID=?";
-
-        List<Integer> friends =
-                jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getInt("friend_id"), userId);
-        return new HashSet<>(friends);
     }
 }
